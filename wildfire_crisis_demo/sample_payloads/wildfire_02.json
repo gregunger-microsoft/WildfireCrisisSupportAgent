@@ -1,0 +1,176 @@
+{
+  "incident_summary": "Overnight wildfire in Timber Creek Valley, Ponderosa County (fictional). Ignited by lightning at 0200h. Slow initial spread in dense timber, now accelerating with morning winds. One community under evacuation advisory, second community threatened.",
+  "weather_feed": [
+    {
+      "id": "WEATHER-1",
+      "timestamp_utc": "2025-08-16T06:00:00Z",
+      "temperature_f": 78.0,
+      "humidity_pct": 22.0,
+      "wind_speed_mph": 10.0,
+      "wind_direction": "E",
+      "wind_gust_mph": 18.0,
+      "red_flag_warning": false,
+      "summary": "Morning conditions moderate. E winds 10 mph gusting 18. Humidity 22%. Warming trend expected."
+    },
+    {
+      "id": "WEATHER-2",
+      "timestamp_utc": "2025-08-16T10:00:00Z",
+      "temperature_f": 92.0,
+      "humidity_pct": 14.0,
+      "wind_speed_mph": 18.0,
+      "wind_direction": "SE",
+      "wind_gust_mph": 30.0,
+      "red_flag_warning": true,
+      "summary": "Red flag warning issued. SE winds increasing to 18 mph gusting 30. Temp 92F. Critical fire weather through 2000h."
+    }
+  ],
+  "fire_behavior": [
+    {
+      "id": "FIRE-1",
+      "timestamp_utc": "2025-08-16T08:00:00Z",
+      "perimeter_acres": 800.0,
+      "rate_of_spread_chains_per_hour": 120.0,
+      "containment_pct": 5.0,
+      "flame_length_ft": 15.0,
+      "spot_fire_count": 1,
+      "summary": "800 acres, 5% contained. ROS accelerating with daytime heating. 1 spot fire. Transitioning from timber to chaparral on W flank."
+    }
+  ],
+  "incident_feed": [
+    {
+      "id": "INC-1",
+      "timestamp_utc": "2025-08-16T07:00:00Z",
+      "event_type": "NEW_START",
+      "location": "Lightning strike Timber Creek ridge",
+      "severity": "HIGH",
+      "summary": "Lightning-caused ignition confirmed at 0200h. Initially 50 acres, now 800 and growing."
+    },
+    {
+      "id": "INC-2",
+      "timestamp_utc": "2025-08-16T09:30:00Z",
+      "event_type": "STRUCTURE_THREAT",
+      "location": "Timber Creek Estates subdivision",
+      "severity": "HIGH",
+      "summary": "Fire approaching Timber Creek Estates. 120 homes in WUI. Fire 2 miles from structures."
+    }
+  ],
+  "road_closures": [
+    {
+      "id": "ROAD-1",
+      "timestamp_utc": "2025-08-16T06:30:00Z",
+      "road_name": "Forest Road 118",
+      "segment": "Full length",
+      "status": "CLOSED",
+      "reason": "Active fire area",
+      "detour_available": false
+    }
+  ],
+  "evacuation": [
+    {
+      "id": "EVAC-1",
+      "timestamp_utc": "2025-08-16T08:00:00Z",
+      "zone_name": "Timber Creek Estates",
+      "order_level": "WARNING",
+      "population_affected": 450,
+      "summary": "Evacuation warning for Timber Creek Estates. 450 residents. Prepare to leave."
+    }
+  ],
+  "shelters": [
+    {
+      "id": "SHELTER-1",
+      "timestamp_utc": "2025-08-16T09:00:00Z",
+      "name": "Valley Community Center",
+      "location": "100 Main St, Valley",
+      "capacity": 400,
+      "current_occupancy": 45,
+      "has_power": true,
+      "has_medical": false,
+      "pet_friendly": true,
+      "ada_accessible": true,
+      "summary": "45 of 400 capacity. Early arrivals from advisory area. Power stable. No medical staff yet."
+    }
+  ],
+  "utilities": [
+    {
+      "id": "UTIL-1",
+      "timestamp_utc": "2025-08-16T07:00:00Z",
+      "utility_type": "POWER",
+      "status": "NORMAL",
+      "affected_area": "All areas",
+      "estimated_restoration_utc": null,
+      "summary": "Power grid normal. Utility monitoring for potential PSPS if winds exceed 35 mph sustained."
+    }
+  ],
+  "resources": [
+    {
+      "id": "RES-1",
+      "resource_type": "ENGINE",
+      "unit_name": "Engine 5",
+      "status": "ASSIGNED",
+      "location": "Timber Creek Estates perimeter",
+      "eta_minutes": null,
+      "duty_hours_remaining": 10.0,
+      "summary": "Engine 5 assigned to structure protection at Timber Creek Estates."
+    },
+    {
+      "id": "RES-2",
+      "resource_type": "ENGINE",
+      "unit_name": "Engine 8",
+      "status": "EN_ROUTE",
+      "location": "En route from Station 12",
+      "eta_minutes": 35,
+      "duty_hours_remaining": 14.0,
+      "summary": "Engine 8 en route to staging. ETA 35 minutes."
+    },
+    {
+      "id": "RES-3",
+      "resource_type": "HAND_CREW",
+      "unit_name": "Hand Crew Bravo",
+      "status": "AVAILABLE",
+      "location": "Fire Camp Alpha",
+      "eta_minutes": null,
+      "duty_hours_remaining": 16.0,
+      "summary": "Hand Crew Bravo rested and available. Full 16 duty hours."
+    },
+    {
+      "id": "RES-4",
+      "resource_type": "HELICOPTER",
+      "unit_name": "Helo 7",
+      "status": "AVAILABLE",
+      "location": "County helibase",
+      "eta_minutes": 10,
+      "duty_hours_remaining": null,
+      "summary": "Type 1 helicopter available for bucket ops. 10 min flight to fire."
+    },
+    {
+      "id": "RES-5",
+      "resource_type": "WATER_TENDER",
+      "unit_name": "Tender 3",
+      "status": "AVAILABLE",
+      "location": "Fire Camp Alpha",
+      "eta_minutes": 25,
+      "duty_hours_remaining": null,
+      "summary": "3000 gallon water tender available for engine support."
+    }
+  ],
+  "constraints": {
+    "max_crew_duty_hours": 16.0,
+    "staging_capacity": 35,
+    "air_support_window_start_utc": "2025-08-16T06:00:00Z",
+    "air_support_window_end_utc": "2025-08-16T20:00:00Z",
+    "max_evacuation_buses": 10,
+    "mutual_aid_available": true,
+    "road_closure_ids": ["ROAD-1"]
+  },
+  "air_quality": [
+    {
+      "id": "AQ-1",
+      "timestamp_utc": "2025-08-16T09:00:00Z",
+      "aqi": 165,
+      "pm25": 88.5,
+      "location": "Timber Creek Valley",
+      "health_advisory": "Unhealthy. Sensitive groups should avoid prolonged outdoor exertion. General public should limit outdoor activity.",
+      "summary": "AQI 165 (Unhealthy). Smoke settling in valley with morning inversion. Expected to worsen with afternoon heating."
+    }
+  ]
+}

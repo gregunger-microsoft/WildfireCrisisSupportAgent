@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔥 Wildfire Crisis Response Coordination</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2d3348;--text:#e4e6f0;--text-muted:#8b8fa3;--accent:#f97316;--accent2:#3b82f6;--green:#22c55e;--red:#ef4444;--yellow:#eab308;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;}
+.header{background:linear-gradient(135deg,#7f1d1d,#991b1b);padding:1.2rem 2rem;display:flex;align-items:center;gap:1rem;border-bottom:2px solid var(--accent);}
+.header h1{font-size:1.4rem;font-weight:700;}
+.header .badge{background:var(--yellow);color:#000;font-size:.7rem;padding:2px 8px;border-radius:3px;font-weight:700;}
+.container{display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:1rem;max-width:1800px;margin:0 auto;min-height:calc(100vh - 70px);}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;}
+.panel-header{background:var(--surface2);padding:.6rem 1rem;font-weight:600;font-size:.85rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.panel-body{padding:1rem;overflow-y:auto;flex:1;}
+.controls{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+select,button{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:.4rem .8rem;border-radius:4px;font-size:.8rem;cursor:pointer;}
+button:hover{border-color:var(--accent);}
+button.primary{background:var(--accent);color:#000;font-weight:600;border-color:var(--accent);}
+button.primary:hover{background:#fb923c;}
+button:disabled{opacity:.5;cursor:not-allowed;}
+textarea{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;font-family:'Cascadia Code','Fira Code',monospace;font-size:.75rem;padding:.5rem;resize:vertical;min-height:200px;}
+.results{margin-top:1rem;}
+.brief-html{background:var(--bg);padding:1rem;border-radius:4px;border:1px solid var(--border);font-size:.85rem;line-height:1.7;max-height:600px;overflow-y:auto;}
+.brief-html h1{font-size:1.3rem;color:var(--accent);margin-bottom:.5rem;}
+.brief-html h2{font-size:1.05rem;color:var(--accent2);margin:1rem 0 .3rem;border-bottom:1px solid var(--border);padding-bottom:.2rem;}
+.brief-html h3{font-size:.95rem;color:var(--text);margin:.8rem 0 .2rem;}
+.brief-html blockquote{border-left:3px solid var(--accent);padding:.5rem 1rem;margin:.5rem 0;background:var(--surface2);border-radius:0 4px 4px 0;}
+.brief-html ul,ol{margin-left:1.2rem;}
+.brief-html li{margin:.2rem 0;}
+.meta-bar{display:flex;gap:1rem;flex-wrap:wrap;margin-top:.5rem;font-size:.75rem;color:var(--text-muted);}
+.meta-bar span{background:var(--surface2);padding:2px 8px;border-radius:3px;}
+.collapsible{margin-top:.5rem;}
+.collapsible summary{cursor:pointer;font-size:.8rem;color:var(--accent2);padding:.3rem 0;}
+.collapsible pre{background:var(--bg);padding:.5rem;border-radius:4px;font-size:.7rem;max-height:300px;overflow:auto;margin-top:.3rem;}
+/* Timeline */
+.timeline-controls{display:flex;gap:.5rem;margin-bottom:.5rem;align-items:center;flex-wrap:wrap;}
+.seg-control{display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.seg-control button{border:none;border-radius:0;border-right:1px solid var(--border);padding:.3rem .7rem;font-size:.75rem;}
+.seg-control button:last-child{border-right:none;}
+.seg-control button.active{background:var(--accent);color:#000;}
+.timeline-list{max-height:500px;overflow-y:auto;}
+.tl-row{border:1px solid var(--border);border-radius:4px;margin-bottom:.3rem;font-size:.78rem;}
+.tl-row-header{display:grid;grid-template-columns:140px 120px 90px 1fr 50px;gap:.3rem;padding:.4rem .6rem;cursor:pointer;align-items:center;}
+.tl-row-header:hover{background:var(--surface2);}
+.tl-row .ts{color:var(--text-muted);font-family:monospace;font-size:.7rem;}
+.tl-row .src{font-weight:600;}
+.tl-row .src.WEATHER{color:#60a5fa;}.tl-row .src.FIRE,.tl-row .src.911{color:var(--red);}
+.tl-row .src.ROADCLOSURE{color:var(--yellow);}.tl-row .src.SHELTER{color:var(--green);}
+.tl-row .src.UTILITIES{color:#a78bfa;}.tl-row .src.AGENT{color:var(--accent);}.tl-row .src.EVAC{color:#fb923c;}
+.tl-row .conf{color:var(--text-muted);}
+.tl-row-details{display:none;padding:.4rem .6rem;background:var(--bg);border-top:1px solid var(--border);font-size:.72rem;}
+.tl-row-details pre{white-space:pre-wrap;word-break:break-all;}
+.tl-row.expanded .tl-row-details{display:block;}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.status-msg{font-size:.8rem;color:var(--text-muted);margin:.5rem 0;}
+.error-msg{color:var(--red);font-size:.85rem;margin:.5rem 0;}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🔥 Wildfire Crisis Response Coordination Agent</h1>
+  <span class="badge">DECISION SUPPORT ONLY</span>
+  <span class="badge" style="background:var(--accent2);color:#fff;">DEMO — Synthetic Data</span>
+</div>
+<div class="container">
+  <!-- Left: Input -->
+  <div class="panel">
+    <div class="panel-header">Incident Data Feed</div>
+    <div class="panel-body">
+      <div class="controls">
+        <select id="sampleSelect">
+          <option value="">-- Load Sample --</option>
+          <option value="wildfire_01">Wildfire Scenario 1 (Active, PSPS)</option>
+          <option value="wildfire_02">Wildfire Scenario 2 (Lightning, WUI)</option>
+        </select>
+        <button onclick="simulateUpdate()">⚡ Simulate Update</button>
+        <button class="primary" onclick="runCoordination()" id="runBtn">▶ Run Coordination</button>
+      </div>
+      <textarea id="payload" placeholder="Load a sample or paste JSON..."></textarea>
+      <div id="statusMsg" class="status-msg"></div>
+      <div id="errorMsg" class="error-msg"></div>
+    </div>
+  </div>
+  <!-- Right: Results -->
+  <div class="panel">
+    <div class="panel-header">
+      <span>Crisis Action Brief</span>
+      <div class="meta-bar" id="metaBar"></div>
+    </div>
+    <div class="panel-body">
+      <div id="briefHtml" class="brief-html" style="display:none;"></div>
+      <details class="collapsible" id="rawJsonSection" style="display:none;">
+        <summary>Raw JSON Response</summary>
+        <pre id="rawJson"></pre>
+      </details>
+      <!-- Trace Timeline -->
+      <div id="timelineSection" style="display:none;margin-top:1rem;">
+        <div class="panel-header" style="margin:-0rem -1rem .5rem -1rem;padding:.5rem 1rem;">
+          Trace Timeline
+        </div>
+        <div class="timeline-controls">
+          <div class="seg-control">
+            <button class="active" onclick="setTimelineTab('incident',this)">Incident Events</button>
+            <button onclick="setTimelineTab('agent',this)">Agent Execution</button>
+            <button onclick="setTimelineTab('all',this)">All</button>
+          </div>
+          <select id="sourceFilter" onchange="renderTimeline()">
+            <option value="">All Sources</option>
+            <option>WEATHER</option><option>FIRE</option><option>911</option>
+            <option>ROADCLOSURE</option><option>EVAC</option><option>SHELTER</option>
+            <option>UTILITIES</option><option>AGENT</option>
+          </select>
+          <button onclick="downloadTimeline()">📥 Download JSON</button>
+        </div>
+        <div class="timeline-list" id="timelineList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+let currentPayload=null,currentResult=null,currentTab='incident',timelineData=[];
+const $=id=>document.getElementById(id);
+
+$('sampleSelect').addEventListener('change',async function(){
+  if(!this.value)return;
+  try{
+    const r=await fetch('/api/samples/'+this.value);
+    if(!r.ok)throw new Error(await r.text());
+    currentPayload=await r.json();
+    $('payload').value=JSON.stringify(currentPayload,null,2);
+    $('statusMsg').textContent='Loaded '+this.value;
+    $('errorMsg').textContent='';
+  }catch(e){$('errorMsg').textContent='Load failed: '+e.message;}
+});
+
+function simulateUpdate(){
+  try{
+    let d=JSON.parse($('payload').value);
+    // Client-side simple mutations
+    if(d.weather_feed&&d.weather_feed.length){
+      let w=d.weather_feed[d.weather_feed.length-1];
+      w.wind_speed_mph=Math.round((w.wind_speed_mph+Math.random()*8+2)*10)/10;
+      w.wind_direction=['NW','N','NE','W'][Math.floor(Math.random()*4)];
+      w.timestamp_utc=new Date().toISOString();
+      w.summary='Wind shifted to '+w.wind_direction+' at '+w.wind_speed_mph+' mph';
+    }
+    if(d.fire_behavior&&d.fire_behavior.length){
+      let f=d.fire_behavior[d.fire_behavior.length-1];
+      f.perimeter_acres=Math.round(f.perimeter_acres*(1+Math.random()*0.1+0.05)*10)/10;
+      f.containment_pct=Math.max(0,Math.round((f.containment_pct-Math.random()*5)*10)/10);
+      f.timestamp_utc=new Date().toISOString();
+    }
+    if(d.air_quality&&d.air_quality.length){
+      let a=d.air_quality[d.air_quality.length-1];
+      a.aqi=Math.min(500,a.aqi+Math.floor(Math.random()*20+10));
+      a.timestamp_utc=new Date().toISOString();
+    }
+    $('payload').value=JSON.stringify(d,null,2);
+    $('statusMsg').textContent='⚡ Payload updated (simulated feed change)';
+  }catch(e){$('errorMsg').textContent='Invalid JSON: '+e.message;}
+}
+
+async function runCoordination(){
+  $('errorMsg').textContent='';
+  $('runBtn').disabled=true;
+  $('statusMsg').innerHTML='<span class="spinner"></span> Running multi-agent pipeline...';
+  try{
+    const body=JSON.parse($('payload').value);
+    const r=await fetch('/crisis/coordinate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok){const e=await r.json();throw new Error(e.detail||r.statusText);}
+    currentResult=await r.json();
+    renderResults(currentResult);
+    $('statusMsg').textContent='✅ Pipeline completed';
+  }catch(e){
+    $('errorMsg').textContent='Error: '+e.message;
+    $('statusMsg').textContent='';
+  }finally{$('runBtn').disabled=false;}
+}
+
+function renderResults(res){
+  // Brief markdown -> HTML (simple conversion)
+  $('briefHtml').innerHTML=md2html(res.brief_markdown);
+  $('briefHtml').style.display='block';
+  // Meta
+  let meta='';
+  meta+=`<span>🔗 ${res.correlation_id.slice(0,8)}...</span>`;
+  for(const[k,v]of Object.entries(res.timings))meta+=`<span>${k}: ${v}s</span>`;
+  $('metaBar').innerHTML=meta;
+  // Raw JSON
+  $('rawJson').textContent=JSON.stringify(res,null,2);
+  $('rawJsonSection').style.display='block';
+  // Timeline
+  timelineData=res.trace_timeline||[];
+  $('timelineSection').style.display='block';
+  renderTimeline();
+}
+
+function setTimelineTab(tab,btn){
+  currentTab=tab;
+  document.querySelectorAll('.seg-control button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTimeline();
+}
+
+function renderTimeline(){
+  const src=$('sourceFilter').value;
+  let items=timelineData;
+  if(currentTab==='incident')items=items.filter(e=>e.kind==='INCIDENT');
+  else if(currentTab==='agent')items=items.filter(e=>e.kind!=='INCIDENT');
+  if(src)items=items.filter(e=>e.source===src);
+  let html='';
+  for(const e of items){
+    const ts=e.timestamp_utc?new Date(e.timestamp_utc).toISOString().slice(11,23):'';
+    const conf=e.confidence!=null?e.confidence+'%':'—';
+    html+=`<div class="tl-row" onclick="this.classList.toggle('expanded')">
+      <div class="tl-row-header">
+        <span class="ts">${ts}</span>
+        <span class="src ${e.source}">${e.source}</span>
+        <span class="conf">${conf}</span>
+        <span>${e.summary.slice(0,100)}</span>
+        <span style="color:var(--text-muted)">▸</span>
+      </div>
+      <div class="tl-row-details">
+        <p><b>Event:</b> ${e.event_type} | <b>Kind:</b> ${e.kind}${e.stage_name?' | <b>Stage:</b> '+e.stage_name:''}${e.agent_name?' | <b>Agent:</b> '+e.agent_name:''}${e.duration_ms!=null?' | <b>Duration:</b> '+e.duration_ms+'ms':''}${e.status?' | <b>Status:</b> '+e.status:''}</p>
+        ${e.citations.length?'<p><b>Citations:</b> '+e.citations.join(', ')+'</p>':''}
+        <pre>${JSON.stringify(e.details,null,2)}</pre>
+      </div>
+    </div>`;
+  }
+  $('timelineList').innerHTML=html||'<div class="status-msg">No events match filter.</div>';
+}
+
+function downloadTimeline(){
+  if(!timelineData.length)return;
+  const blob=new Blob([JSON.stringify(timelineData,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='trace_timeline.json';a.click();URL.revokeObjectURL(a.href);
+}
+
+function md2html(md){
+  return md.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/^- \[ \] (.+)$/gm,'<li>☐ $1</li>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
+    .replace(/\n{2,}/g,'<br><br>')
+    .replace(/\n/g,'<br>');
+}
+</script>
+</body>
+</html>

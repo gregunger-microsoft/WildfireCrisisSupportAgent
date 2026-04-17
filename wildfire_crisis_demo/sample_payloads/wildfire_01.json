@@ -1,0 +1,225 @@
+{
+  "incident_summary": "Fast-moving wildfire in Ponderosa County, CA (fictional). Ignited 0800h near Pine Ridge trailhead. Driven by strong SW winds across dry chaparral. Two communities under evacuation orders. PSPS in effect for Zone C.",
+  "weather_feed": [
+    {
+      "id": "WEATHER-1",
+      "timestamp_utc": "2025-08-15T12:00:00Z",
+      "temperature_f": 98.0,
+      "humidity_pct": 12.0,
+      "wind_speed_mph": 25.0,
+      "wind_direction": "SW",
+      "wind_gust_mph": 42.0,
+      "red_flag_warning": true,
+      "summary": "Red flag warning active. SW winds 25 mph gusting 42. Temp 98F, humidity 12%."
+    },
+    {
+      "id": "WEATHER-2",
+      "timestamp_utc": "2025-08-15T15:00:00Z",
+      "temperature_f": 101.0,
+      "humidity_pct": 9.0,
+      "wind_speed_mph": 30.0,
+      "wind_direction": "SW",
+      "wind_gust_mph": 48.0,
+      "red_flag_warning": true,
+      "summary": "Conditions worsening. Wind shift to NW expected around 1800h. Gusts to 48 mph."
+    }
+  ],
+  "fire_behavior": [
+    {
+      "id": "FIRE-1",
+      "timestamp_utc": "2025-08-15T14:00:00Z",
+      "perimeter_acres": 2500.0,
+      "rate_of_spread_chains_per_hour": 300.0,
+      "containment_pct": 15.0,
+      "flame_length_ft": 30.0,
+      "spot_fire_count": 3,
+      "summary": "2500 acres, 15% contained. ROS 300 ch/hr. 3 spot fires ahead of main front. Flame lengths 30 ft."
+    }
+  ],
+  "incident_feed": [
+    {
+      "id": "INC-1",
+      "timestamp_utc": "2025-08-15T13:00:00Z",
+      "event_type": "911_SURGE",
+      "location": "Ponderosa County dispatch",
+      "severity": "HIGH",
+      "summary": "911 call volume 340% above normal. Majority requesting evacuation assistance."
+    },
+    {
+      "id": "INC-2",
+      "timestamp_utc": "2025-08-15T14:30:00Z",
+      "event_type": "SPOT_FIRE",
+      "location": "0.5 mi NE of Zone B perimeter",
+      "severity": "CRITICAL",
+      "summary": "Spot fire reported 0.5 mi NE of Zone B. Threatens additional 200 structures."
+    }
+  ],
+  "road_closures": [
+    {
+      "id": "ROAD-1",
+      "timestamp_utc": "2025-08-15T10:00:00Z",
+      "road_name": "SR-45",
+      "segment": "Mile marker 12 to 18",
+      "status": "CLOSED",
+      "reason": "Active fire crossing",
+      "detour_available": true
+    },
+    {
+      "id": "ROAD-2",
+      "timestamp_utc": "2025-08-15T12:30:00Z",
+      "road_name": "County Road 7",
+      "segment": "Pine Ridge to Oak Valley",
+      "status": "CLOSED",
+      "reason": "Smoke and visibility hazard",
+      "detour_available": false
+    }
+  ],
+  "evacuation": [
+    {
+      "id": "EVAC-1",
+      "timestamp_utc": "2025-08-15T09:00:00Z",
+      "zone_name": "Zone A",
+      "order_level": "ORDER",
+      "population_affected": 1800,
+      "summary": "Mandatory evacuation Zone A. 1800 residents. Fire approaching from SW."
+    },
+    {
+      "id": "EVAC-2",
+      "timestamp_utc": "2025-08-15T11:00:00Z",
+      "zone_name": "Zone B",
+      "order_level": "WARNING",
+      "population_affected": 1400,
+      "summary": "Evacuation warning Zone B. 1400 residents. Prepare to evacuate if fire advances."
+    }
+  ],
+  "shelters": [
+    {
+      "id": "SHELTER-1",
+      "timestamp_utc": "2025-08-15T13:00:00Z",
+      "name": "Ponderosa High School Gym",
+      "location": "400 Oak St, Ponderosa",
+      "capacity": 500,
+      "current_occupancy": 310,
+      "has_power": true,
+      "has_medical": true,
+      "pet_friendly": true,
+      "ada_accessible": true,
+      "summary": "310 of 500 capacity. Medical staff on-site. Power stable. Pet-friendly."
+    },
+    {
+      "id": "SHELTER-2",
+      "timestamp_utc": "2025-08-15T13:00:00Z",
+      "name": "Riverside Community Center",
+      "location": "200 River Rd, Riverside",
+      "capacity": 300,
+      "current_occupancy": 185,
+      "has_power": false,
+      "has_medical": false,
+      "pet_friendly": false,
+      "ada_accessible": true,
+      "summary": "185 of 300 capacity. POWER OUT due to PSPS. No medical staff. Need generator."
+    }
+  ],
+  "utilities": [
+    {
+      "id": "UTIL-1",
+      "timestamp_utc": "2025-08-15T11:00:00Z",
+      "utility_type": "POWER",
+      "status": "SHUTOFF",
+      "affected_area": "Zone C and Riverside area",
+      "estimated_restoration_utc": null,
+      "summary": "PSPS active for Zone C and Riverside. No restoration estimate. Impacts shelter and cell towers."
+    },
+    {
+      "id": "UTIL-2",
+      "timestamp_utc": "2025-08-15T13:00:00Z",
+      "utility_type": "COMMS",
+      "status": "DEGRADED",
+      "affected_area": "Sector 4 (Zone C coverage)",
+      "estimated_restoration_utc": null,
+      "summary": "Cell tower in Sector 4 on backup battery. Estimated 4 hours remaining. Degraded coverage Zone C."
+    }
+  ],
+  "resources": [
+    {
+      "id": "RES-1",
+      "resource_type": "ENGINE",
+      "unit_name": "Engine 3",
+      "status": "AVAILABLE",
+      "location": "Station 7 - Oak Valley",
+      "eta_minutes": null,
+      "duty_hours_remaining": 8.0,
+      "summary": "Engine 3 available at Station 7. Full crew. 8 duty hours remaining."
+    },
+    {
+      "id": "RES-2",
+      "resource_type": "HAND_CREW",
+      "unit_name": "Hand Crew Alpha",
+      "status": "ASSIGNED",
+      "location": "SE flank line construction",
+      "eta_minutes": null,
+      "duty_hours_remaining": 2.0,
+      "summary": "Hand Crew Alpha on SE flank. 14 of 16 duty hours used. Rotation needed by 2000h."
+    },
+    {
+      "id": "RES-3",
+      "resource_type": "AIR_TANKER",
+      "unit_name": "Tanker 81",
+      "status": "AVAILABLE",
+      "location": "Ponderosa Air Base",
+      "eta_minutes": 15,
+      "duty_hours_remaining": null,
+      "summary": "Air tanker available. Window closes 1900h due to visibility/wind limits."
+    },
+    {
+      "id": "RES-4",
+      "resource_type": "BUS",
+      "unit_name": "Transit Bus 1",
+      "status": "AVAILABLE",
+      "location": "County Transit Yard",
+      "eta_minutes": 30,
+      "duty_hours_remaining": null,
+      "summary": "40-passenger bus available for evacuation transport."
+    },
+    {
+      "id": "RES-5",
+      "resource_type": "GENERATOR",
+      "unit_name": "Generator 2",
+      "status": "AVAILABLE",
+      "location": "Public Works Yard",
+      "eta_minutes": 45,
+      "duty_hours_remaining": null,
+      "summary": "50kW generator available. Fuel for approximately 12 hours."
+    },
+    {
+      "id": "RES-6",
+      "resource_type": "AMBULANCE",
+      "unit_name": "Medic 1",
+      "status": "AVAILABLE",
+      "location": "Station 3",
+      "eta_minutes": 20,
+      "duty_hours_remaining": 6.0,
+      "summary": "ALS ambulance available. Paramedic crew. 6 duty hours remaining."
+    }
+  ],
+  "constraints": {
+    "max_crew_duty_hours": 16.0,
+    "staging_capacity": 50,
+    "air_support_window_start_utc": "2025-08-15T06:00:00Z",
+    "air_support_window_end_utc": "2025-08-15T19:00:00Z",
+    "max_evacuation_buses": 20,
+    "mutual_aid_available": true,
+    "road_closure_ids": ["ROAD-1", "ROAD-2"]
+  },
+  "air_quality": [
+    {
+      "id": "AQ-1",
+      "timestamp_utc": "2025-08-15T14:00:00Z",
+      "aqi": 285,
+      "pm25": 185.3,
+      "location": "Ponderosa County central",
+      "health_advisory": "Very Unhealthy. Sensitive groups and general public should avoid outdoor activity. Use N95 masks if outside.",
+      "summary": "AQI 285 (Very Unhealthy). PM2.5 at 185.3 ug/m3. Smoke plume covering central county."
+    }
+  ]
+}
