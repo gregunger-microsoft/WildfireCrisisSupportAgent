@@ -1,0 +1,254 @@
+You are a senior staff software engineer and solutions architect. Build a demo-ready, test-driven Python application that implements a “Wildfire Crisis Response Coordination Agent” using Microsoft Azure AI Foundry Agent Service and Microsoft AI services. This is for a technical trade show booth demo: it must run reliably, be easy to explain in 2–4 minutes, and be repeatable.
+
+PRIMARY GOALS (must demonstrate)
+1) Multi-agent collaboration (parallel specialists + supervisor / maker-checker pattern) 
+2) Real-time(ish) data ingestion (simulated streaming updates is OK)
+3) Decision support workflow (recommendations with constraints)
+4) Guardrails + traceability (policy enforcement, citations, correlation IDs)
+5) Observability: stage timings + a Trace Timeline panel + optional Foundry/AppInsights tracing
+
+HARD GUARDRAILS (IMPORTANT)
+- Use synthetic/unclassified data only.
+- Decision support only. Must not present as command authority.
+- Do NOT provide weapons guidance, targeting advice, harmful instructions, or wrongdoing enablement.
+- Do NOT include PII. Ensure sample payloads contain no real names, addresses, phone numbers.
+- Every recommendation must include: confidence (0–100), assumptions, and verification flags.
+- SupervisorAgent must enforce policy constraints and block unsafe/unverifiable outputs.
+
+TECH FOUNDATION (must use)
+- Python 3.11+
+- Local dev uses python venv: `python -m venv .venv`
+- Best practices, clean architecture, type hints everywhere
+- Test Driven Development (TDD) with pytest (+ pytest-asyncio)
+- Strict schemas via Pydantic v2; validate every stage handoff
+- Use Microsoft Azure AI Foundry Agents/Threads/Runs via official SDK:
+  - Prefer azure-ai-projects (recommended) and/or azure-ai-agents
+  - Auth via DefaultAzureCredential for local dev (Azure CLI az login)
+- Observability:
+  - Structured JSON logging with correlation_id
+  - Optional OpenTelemetry + Azure Monitor export to Application Insights if env vars exist
+  - Include step timings in responses
+
+DEMO SCENARIO (Wildfire)
+Simulate a fast-moving wildfire in a fictional county (e.g., “Ponderosa County”) with:
+- ignition detection + wind shift + smoke/air quality + perimeter growth
+- 911 call surge + road closures + evacuation zones
+- power shutoff (PSPS-like) impacting comms/shelters
+- shelter capacity + medical needs
+- resources: engines, hand crews, air tankers (recommendations only), ambulances, buses, generators
+- constraints: travel time, road closures, crew duty hours, staging capacity, air support availability windows
+
+TRACE TIMELINE (NEW — MUST ADD)
+The system must maintain an append-only “Trace Timeline” for each run that captures:
+- incident event timeline (what happened when) and
+- agent execution timeline (what the system did when)
+
+Trace Timeline requirements:
+A) Define a TraceEvent schema (Pydantic), used throughout the system.
+B) Every run must return trace_timeline: List[TraceEvent]
+C) UI must show a Trace Timeline panel with:
+   - a toggle: “Incident events” vs “Agent execution”
+   - filter: by source (WEATHER, 911, ROADCLOSURE, SHELTER, UTILITIES, AGENT)
+   - each row shows: timestamp_utc, event_type, source, summary, confidence, citations
+   - clicking a row reveals “details” (JSON) and citations
+D) Agent execution events must include: stage_name, agent_name, start/end timestamps, duration_ms, status (ok/retry/blocked), and a trace_id/span_id if tracing is enabled.
+E) Provide a “Download trace_timeline.json” button in the UI.
+
+Multi-agent orchestration patterns must remain consistent with common Foundry multi-agent architectures (maker-checker/supervisor/hand-off).
+
+AGENTS (each must be a distinct Foundry agent with its own system instructions)
+At minimum:
+1) DataIngestAgent (Sense): normalize raw feeds → structured IncidentSnapshot JSON
+2) SitRepAgent (Think): draft structured SITREP with key facts + priorities + open questions
+3) ResourceAllocatorAgent (Think): recommend a resource allocation plan under constraints
+4) SupervisorAgent (Verify): validate all outputs, enforce policy constraints, flag uncertainty, block unsafe/unverifiable actions
+5) BriefAgent (Decide): synthesize a “Crisis Action Brief” for an EOC leader:
+   - Situation overview
+   - Top risks (ranked) with confidence
+   - Recommended actions (3 COAs) with tradeoffs/risks
+   - Resource plan summary
+   - Verification checklist
+   - Citizen-facing messaging draft (short, accessible; no panic; no PII)
+
+Optional extra agent:
+6) AirQualityHealthAgent: recommends health mitigations + messaging (still decision support)
+
+ORCHESTRATION REQUIREMENTS (must be REAL orchestration)
+- Stage 0: Build Trace Timeline container and correlation_id at start
+- Stage 1: DataIngestAgent runs first (normalization); append timeline events for key incident items identified
+- Stage 2: Run SitRepAgent and ResourceAllocatorAgent in parallel (asyncio.gather); record execution timeline entries
+- Stage 3: SupervisorAgent reviews; can:
+  - “approve” with flags,
+  - “revise” by requiring regeneration with constraints, or
+  - “block” if policy violations or missing critical data.
+  Record supervisor decision as a timeline event.
+- Stage 4: BriefAgent produces final bundled output; record brief generation.
+- Persist and return a shared correlation_id for the run and include per-stage timings.
+- Enforce strict schema validation between ALL stages (fail fast).
+- If an agent returns invalid JSON, perform exactly ONE “repair attempt” with a repair prompt; if still invalid, fail the run and record an error event in the timeline.
+
+OUTPUT FORMAT RULES (deterministic, testable)
+Every agent MUST output JSON ONLY (no prose) strictly matching its schema.
+Every agent output MUST include:
+- confidence: integer 0–100
+- assumptions: list[str]
+- citations: list[str] referencing which feed items were used (e.g., “WEATHER-2”, “EVAC-1”, “ROAD-3”)
+- verification_flags: list[str]
+No extra fields beyond schema. Use Pydantic v2 strict settings.
+
+PUBLIC API (FastAPI)
+1) GET /
+  - Returns a single HTML page with:
+    - dropdown to load sample payloads: wildfire_01, wildfire_02
+    - editable JSON textarea
+    - buttons:
+      - “Simulate Update” (mutate payload locally in-browser to mimic live feed update)
+      - “Run Coordination”
+    - results panel:
+      - render Crisis Action Brief Markdown → HTML
+      - collapsible raw JSON response
+      - correlation_id + per-stage timings
+    - Trace Timeline panel (NEW):
+      - tabbed/segmented control: Incident Events / Agent Execution
+      - filter dropdown by source
+      - scrollable timeline list with expandable details
+      - download trace_timeline.json
+2) POST /crisis/coordinate
+  - Accepts a WildfireIncidentBundle schema
+  - Returns:
+    - CrisisActionBrief JSON object
+    - brief_markdown
+    - timings per stage
+    - correlation_id
+    - trace_timeline: List[TraceEvent]
+Optional:
+3) GET /crisis/trace/{correlation_id}
+  - returns the trace_timeline if you keep a simple in-memory store (TTL) for demo convenience (no DB).
+
+DATA MODEL (Pydantic v2)
+Define Pydantic v2 models:
+Input:
+- WildfireIncidentBundle:
+  - incident_summary: str
+  - weather_feed: list[WeatherUpdate]
+  - fire_behavior: list[FireBehaviorUpdate] (perimeter, rate_of_spread, containment estimates)
+  - incident_feed: list[IncidentUpdate] (911 surge, new starts, spot fires)
+  - road_closures: list[RoadClosure]
+  - evacuation: list[EvacuationUpdate]
+  - shelters: list[ShelterStatus]
+  - utilities: list[UtilityUpdate] (power shutoff, comms degradation)
+  - resources: list[ResourceStatus]
+  - constraints: Constraints
+  - air_quality: list[AirQualityUpdate]
+
+Core:
+- TraceEvent:
+  - timestamp_utc: datetime
+  - kind: Literal["INCIDENT","AGENT_EXECUTION","POLICY","ERROR"]
+  - event_type: str (e.g., "WIND_SHIFT", "EVAC_ORDER", "AGENT_START", "AGENT_END", "SUPERVISOR_BLOCK")
+  - source: str (e.g., "WEATHER", "EVAC", "ROAD", "SHELTER", "UTILITIES", "AGENT")
+  - summary: str
+  - confidence: int 0–100 (or None only if kind="AGENT_EXECUTION" and you document why)
+  - citations: list[str]
+  - details: dict (strictly JSON-serializable)
+  - stage_name: Optional[str]
+  - agent_name: Optional[str]
+  - duration_ms: Optional[int]
+  - status: Optional[Literal["ok","retry","blocked","failed"]]
+
+Domain outputs:
+- IncidentSnapshot (DataIngest output)
+- SitRep (SitRep output)
+- ResourcePlan (ResourceAllocator output)
+- SupervisorReview (Supervisor output)
+- CrisisActionBrief (final output):
+  - overview, risks[], COAs (3), resource_plan_summary, verification_checklist,
+    public_message, internal_message, metadata (confidence, citations, correlation_id)
+
+MICROSOFT SERVICES INTEGRATION
+- Azure AI Foundry Agent Service: use azure-ai-projects and/or azure-ai-agents for agent/thread/run operations.
+- Optional: Azure AI Content Safety text check for public_message + brief summary:
+  - If configured by env vars, run content moderation / jailbreak checks and block outputs if needed.
+  - Must be fully optional so offline tests pass.
+
+OBSERVABILITY
+- Structured JSON logging including correlation_id, stage_name, agent_name, duration_ms.
+- If APPLICATIONINSIGHTS_CONNECTION_STRING exists, enable OpenTelemetry export to Azure Monitor/Application Insights.
+- In README, explain how tracing relates to Foundry and App Insights at a high level (no deep how-to).
+
+REPO STRUCTURE (clean architecture)
+wildfire_crisis_demo/
+  app/
+    main.py            # FastAPI app
+    routes.py          # / and /crisis/coordinate (+ optional /crisis/trace/{id})
+    deps.py            # dependency injection providers
+  domain/
+    models.py          # Pydantic schemas including TraceEvent
+    policy.py          # policy constraints and checks
+  services/
+    orchestrator.py    # pipeline orchestration + timeline recording
+    prompts.py         # system prompts for each agent (as strings)
+    simulator.py       # “Simulate Update” logic support (CLI server-side)
+    timeline.py        # timeline append/query helpers (in-memory store with TTL for demo)
+  foundry/
+    client.py          # thin wrapper interface + real implementation
+    fake_client.py     # deterministic fake for tests (no Azure)
+  ui/
+    index.html         # single page + embedded JS; includes Trace Timeline panel
+    render.py          # markdown rendering helper (server-side)
+  sample_payloads/
+    wildfire_01.json   # synthetic sample 1
+    wildfire_02.json   # synthetic sample 2
+  cli.py               # run pipeline from command line
+  observability.py     # logging + optional OTel wiring
+  tests/
+    unit/
+    contract/
+    integration/       # skipped if env vars missing
+  pyproject.toml or requirements.txt
+  README.md
+  .env.example
+
+TESTING REQUIREMENTS (robust)
+- Unit & contract tests must run offline without Azure.
+- Provide FakeFoundryClient returning deterministic JSON for each agent for tests.
+- Unit tests:
+  - schema validation and bounds (confidence 0–100)
+  - orchestrator stage ordering + parallel behavior
+  - timeline is populated correctly (both incident + agent execution events)
+  - Supervisor blocks when critical info missing or policy violations occur
+- Contract tests:
+  - each agent output validates against its schema
+- Integration tests:
+  - run only if AZURE_AI_PROJECT_ENDPOINT and credentials exist
+  - execute a real Foundry agent/thread/run and validate schema
+
+VERIFY EVERYTHING
+- Validate every agent response as strict JSON that matches schema.
+- Reject and retry (repair) ONCE if invalid.
+- Record errors as TraceEvent(kind="ERROR") and propagate failure.
+- No silent fallbacks.
+
+DELIVERABLES: OUTPUT EVERYTHING
+When you respond, output:
+1) Complete repo tree
+2) All source files as code blocks with file paths
+3) README.md with:
+   - venv setup
+   - env vars (.env.example)
+   - run FastAPI
+   - run CLI
+   - run tests
+   - curl examples
+   - “2-minute booth demo script” including highlighting Trace Timeline
+4) Two sample payload JSON files: wildfire_01.json and wildfire_02.json (synthetic)
+5) Keep UI minimal but polished enough for a booth; NO frontend frameworks
+
+STYLE
+- Type hints throughout
+- Small functions, high cohesion
+- Dependency injection for Foundry client and optional content safety
+- No databases (use in-memory TTL timeline store only)
+- Clear comments, not verbose
+
+NOW BUILD THE FULL IMPLEMENTATION.
